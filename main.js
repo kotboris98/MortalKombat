@@ -9,7 +9,10 @@ const player1 = {
     weapon: ['Gun', 'Shotgun', 'Submachine gun'],
     attack: function fight1() {
         console.log(this.name + 'fight...');
-    }
+    },
+    changeHP,
+    elHP,
+    renderHP
 };
 
 const player2 = {
@@ -20,7 +23,10 @@ const player2 = {
     weapon: ['Assault rifle', 'Sniper rifle', 'Machine gun'],
     attack: function fight2() {
         console.log(this.name + 'fight...');
-    }
+    },
+    changeHP,
+    elHP,
+    renderHP
 };
 
 function createElement(tag, className) {
@@ -53,27 +59,29 @@ function createPlayer(playerObj) {
     return $player1;
 } 
 
-function changeHP(player) {
-    const $playerLife = document.querySelector('.player' + player.player + ' .life');
-    player.hp -= getRandomNumber(20);
+function changeHP(randomNumber) {
+    this.hp -= randomNumber;
 
-    if (player.hp <= 0) {
-        player.hp = 0;
-        $randomButton.disabled = true;
-
-        if (player1.hp === 0 && player2.hp > 0) {
-            $arenas.appendChild(playerWins(player2.name));
-        } else {
-            $arenas.appendChild(playerWins(player1.name));
-        }
+    if (this.hp <= 0) {
+        this.hp = 0;
     }
+}
 
-    $playerLife.style.width = player.hp + '%';
+function elHP() {
+    return document.querySelector('.player' + this.player + ' .life');
+}
+
+function renderHP() {
+    this.elHP.style.width = this.hp + '%'; 
 }
 
 function playerWins(name) {
     const $winsTitle = createElement('div', 'loseTitle');
-    $winsTitle.innerText = name + ' wins';
+    if (name) {
+        $winsTitle.innerText = name + ' wins';
+    } else {
+        $winsTitle.innerText = 'draw';
+    }
 
     return $winsTitle;
 }
@@ -82,10 +90,41 @@ function getRandomNumber(number) {
     return Math.ceil(Math.random() * number);
 }
 
+function createReloadButton() {
+    const $divReloadButton = createElement('div', 'reloadWrap');
+    const $reloadButton = createElement('button', 'button');
+
+    $reloadButton.innerText = 'Restart';
+
+    $divReloadButton.appendChild($reloadButton);
+
+    $reloadButton.addEventListener('click', function() {
+        window.location.reload();
+    })
+
+    $arenas.appendChild($divReloadButton);
+}
+
 $randomButton.addEventListener('click', function() {
     console.log('####: Click Random Button');
-    changeHP(player1);
-    changeHP(player2);
+    player1.changeHP(getRandomNumber(20));
+    player1.renderHP;
+
+    player2.changeHP(getRandomNumber(20));
+    player2.renderHP;
+
+    if (player1.hp === 0 || player2.hp === 0) {
+        $randomButton.disabled = true;
+        createReloadButton();
+    }
+
+    if (player1.hp === 0 && player1.hp < player2.hp) {
+        $arenas.appendChild(playerWins(player2.name));
+    } else if (player2.hp === 0 && player2.hp < player1.hp) {
+        $arenas.appendChild(playerWins(player1.name));
+    } else if (player1.hp === 0 && player2.hp === 0) {
+        $arenas.appendChild(playerWins());
+    }
 })
 
 $arenas.appendChild(createPlayer(player1));
